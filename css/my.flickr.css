@@ -1,0 +1,167 @@
+@charset "utf-8";
+@import "http://www.stokeshot.com/css/nukamiso.css";
+
+html
+{
+	margin: 0;
+	padding: 0;
+}
+
+body
+{
+  background: #ffffff;
+  font-size: 1.0em;
+}
+
+img {  border: none; }
+
+h1 {
+  color: #555;
+  font-size: 150%;
+  margin: 8px;
+}
+
+h2 {
+  color: #555555;
+  font-size: 110%;
+}
+
+a { color: #393; text-decoration: underline; }
+a:visited { color: #666; }
+a:hover { color: #f93; }
+
+.article {  text-align: left;}
+
+ul.inline
+{
+  margin: 0;
+  padding: 0;
+}
+
+ul.inline li
+{
+  list-style: none;
+  display: inline;
+}
+
+#header {
+  text-align: center;
+  background: #ffffff;
+  padding: 10px 20px;
+  margin: 0 20px;
+}
+
+#container {
+  background: #ffffff;
+  margin: 0 20px;
+}
+
+.grid div.float
+{
+  width: 120px;
+  margin: 6px 2px;
+  text-align :center;
+  font-size: 70%;
+  float: left;
+}
+
+.grid {
+    overflow: hidden;
+}
+
+.grid:after {
+    content: "";
+    display: block;
+    clear: both;
+    height: 1px;
+    overflow: hidden;
+}
+
+/*\*/
+* html .grid {
+    height: 1em;
+    overflow: visible;
+}
+/**/
+
+div.footer
+{
+  clear: both;
+  font-size: 90%;
+  text-align: center;
+  color: #888888;
+  padding: 20px 0;
+  margin: 20px 0;
+  width: 100%;
+}
+
+div#tab-order div#menu
+{
+  float: right;  
+  width: 160px;
+  font-size: 86%;
+}
+
+div#tab-order div#view
+{
+  float: left;
+  width: 640px;
+}
+
+#preview a
+{
+  border: none;
+  text-decoration: none;
+}
+
+ul#ordering
+{
+  margin: 0;
+  list-style: none;  
+}
+
+
+#loading {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#flickr_form
+{
+  margin: 0 auto;
+  text-align: center;
+  width: 700px;
+}
+
+#flickr_form label
+{
+  display: block;
+  float: left;
+  width: 200px;
+}
+
+#flickr_id, #flickr_tags, #flickr_load, b#flickr_reset
+{
+  display: block;
+  float: left;  
+  width: 200px;
+}
+
+#flickr_form p.note
+{
+  color: #555555; font-size: 85%;
+  text-align: right;
+}
+
+#flickr_load { width: 150px;}
+#flickr_form div.radios { text-align: left;}
+#flickr_form div.radios label { text-align: center; }
+
+#flickr_list { margin: 0; padding: 0;}
+#flickr_list li { list-style: none;}
+.flickr_textarea {
+    width: 100%;
+    height: 5em;
+    line-height: 1.2em;
+}

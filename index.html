@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="emacs" />
+<meta name="keywords" content="Flickr ブログ html ツール jQuery 画像　写真" />
+<meta name="description" content="Flickrにアップロードした写真を、ブログで利用するためのツールです。自分のFlickrのユーザIDで写真を健作氏、選択した画像のHTMLを出力します。並び替えやサムネイル表示なども可能。" />
+<link rev="made" title="作成者" href="mailto:kaneko@gmail.com" />
+<link rel="contents"  title="目次" href="http://www.goodpic.com/" />
+
+
+<link type="text/css" href="./jquery-ui/css/custom-theme/jquery-ui-1.7.1.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="./jquery-ui/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="./jquery-ui/js/jquery-ui-1.7.1.custom.min.js"></script>
+<script type="text/javascript" src="./js/jquery.cookie.js" ></script>
+
+<script type="text/javascript" src="./js/my.flickr.js" ></script>
+<link rel="stylesheet" type="text/css" href="./css/my.flickr.css" media="screen" />
+
+<script src="./js/jquery.lightbox-0.3.1.js" type="text/javascript" ></script> 
+<link rel="stylesheet" type="text/css" href="./css/jquery.lightbox-0.3.css" media="screen" />
+  
+
+
+<script type="text/javascript">
+  
+$(document).ready( function(){
+
+  $('#tabs').tabs();
+  $.flickr.init();
+
+});
+</script>
+
+<title>Flickr to HTML : 画像を選んで&lt;img&gt;タグに</title>
+</head>
+
+<body>
+  <div id="header">
+    <h1><img src="./images/logo.png" width="276" height="77" /></h1>
+    <p>Flickrにアップした写真を、ブログやTwitterで公開。複数写真の並び替えや、アルバム表示も可能です。</p>
+    
+    <form id="flickr_form" action="">
+        <label>FlickrユーザID</label>
+        <input id="flickr_id" type="text" value="" />
+        <input id="flickr_load" type="submit" value="画像を検索" />
+        <br style="clear:both;"/> 
+        <p class="note"> <strong>ユーザIDとは？</strong>　31856513@N00 など、自分のFlickr IDです。<a href="http://idgettr.com/" target="_blank">idGettr</a>で調べられます。</p>
+
+      <fieldset id="flickr_advance">
+        <legend>検索オプション</legend>
+
+        <label>タグで絞り込み</label> <input id="flickr_tags" type="text" value="" /><br />
+        <div class="radios">
+          <label>検索数</label>
+          <input name="per_page" type="radio" value="100" checked="checked" /> 100
+          <input name="per_page" type="radio" value="200" /> 200
+          <input name="per_page" type="radio" value="300" /> 300
+          <input name="per_page" type="radio" value="400" /> 400
+          <input name="per_page" type="radio" value="500" /> 500
+        </div>
+      </fieldset>
+    </form>
+    <br style="clear:both;">
+  </div> <!-- head -->
+  
+  <div id="container" style="display: none;" class="grid">
+
+    <div id="tabs">
+      <ul>
+        <li><a href="#tab-import"><span>Flickrの画像選択</span></a></li>
+        <li><a href="#tab-order"><span>プレビュー＆並び替え</span></a></li>
+        <li><a href="#tab-html"><span>HTMLを表示</span></a></li>
+      </ul>
+
+          <div id="tab-import" class="article">
+            <p>画像をクリックすると拡大表示し、１枚ごとのHTMLを表示します。『写真』をチェックすると、並び替えのできる写真リストに追加。『小』をチェックすると、並び替えのできないアイコンリストに追加します。画像を選択したら、『プレビュー＆並び替え』タブをクリック。</p>
+            <div id="loading"><img src="images/ajax-loader.gif" /></div>
+            <div id="flickr" class="grid"></div>
+            <form><label>やり直す</label> <input id="flickr_reset" type="button" value="検索結果をリセット" /></form>
+
+          </div> <!-- #tab-import  -->
+
+          
+    <div id="tab-order" class="article">
+      
+      <div id="view">
+        <p>右側の『並び替えメニュー』で順番を変更します。並び替えが終了したら、『HTMLを表示』タブをクリックしてください。『Flickrの画像選択』をクリックして、写真の選択にも戻れます。</p>
+        <form id="menu_size">
+          <ul class="inline">
+            <li>表示写真サイズ　：　</li>
+            <li><input type="radio" id="menu_size_l" name="menu_input" /> 大（500x333）</li>
+            <li><input type="radio" id="menu_size_s" name="menu_input" checked="checked" /> 小（240x160）</li>
+          </ul>
+        </form>
+        <h2>プレビュー</h2>
+        <div id="preview"></div>
+        <div id="preview-icon"></div>
+      </div> <!-- #main -->
+
+		  <div id="menu" class="ui-accordion ui-widget ui-helper-reset" style="">
+				  <h3 class="ui-accordion-header ui-helper-reset ui-state-active ui-corner-top"><a href="#">並び替えメニュー</a></h3>
+				  <div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active" style="text-align: center; padding: 8px;">
+            写真をドラッグ＆ドロップで並び替え<br />
+            <form id="menu_br"><input type="button" id="menu_br_add" value="改行追加" /></form>
+            <ul id="ordering"></ul>
+          </div>
+		  </div>
+        
+
+      <br style="clear:both;" />
+    </div> <!-- #tab-order -->
+
+    <div id="tab-html" class="article">
+      <h3>画像のHTML</h3>
+      <div id="htmlsource">
+        <textarea style="font-size: 90%; width: 100%;" cols="100" rows="16" id="target"></textarea>
+      </div>
+    </div> <!-- #tab-html  -->
+
+  </div> <!-- #tabs  -->
+
+  </div> <!-- container  -->
+  <div class="footer">
+    Amazonの画像を貼付けるなら <a href="http://g-tools.com/">G-Tools</a>。<br />
+    by <a href="http://www.goodpic.com/">goodpic.com</a> , 2008-2010<br />
+    <a href="http://b.hatena.ne.jp/entry/http://www.stokeshot.com/flickr/" title="Flickr to HTMLのブックマーク" rel="nofollow"><img src="http://b.hatena.ne.jp/entry/image/normal/http://www.stokeshot.com/flickr/" alt="はてなブックマーク" /></a>
+  </div>  
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-51462-4");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+</body>
+</html>
