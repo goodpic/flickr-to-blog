@@ -25,7 +25,7 @@
 			// Configuration related to texts in caption. For example: Image 2 of 8. You can alter either "Image" and "of" texts.
 			txtImage:				'Image',	// (string) Specify text "Image"
 			txtOf:					'of',		// (string) Specify text "of"
-			// Donｴt alter these variables in any way
+			// Don't alter these variables in any way
 			imageArray:				[],
 			activeImage:			0
 		},settings);
@@ -51,7 +51,7 @@
 			settings.imageArray.length = 0;
 			// Unset image active information
 			settings.activeImage = 0;
-			// We have an image set? Or just an image? Letｴs see it.
+			// We have an image set? Or just an image? Let's see it.
 			if ( jQueryMatchedObj.length == 1 ) {
 				settings.imageArray.push(new Array(objClicked.getAttribute('href'),objClicked.getAttribute('title')));
 			} else {
@@ -104,26 +104,9 @@
 		 */
 		function _set_interface() {
 			// Apply the HTML markup into body tag
-			$('body').append('<div id="jquery-overlay"></div><div id="jquery-lightbox"><div id="lightbox-container-image-box"><div id="lightbox-container-image"><img id="lightbox-image"><div style="" id="lightbox-nav"><a href="#" id="lightbox-nav-btnPrev"></a><a href="#" id="lightbox-nav-btnNext"></a></div><div id="lightbox-loading"><a href="#" id="lightbox-loading-link"><img src="' + settings.imageLoading + '"></a></div></div></div><div id="lightbox-container-image-data-box"><div id="lightbox-container-image-data"><div id="lightbox-image-details"><span id="lightbox-image-details-currentNumber"></span></div>'
-   + '<div id="lightbox-image-info"></div>'
-   + '<h4>ブログ記事用のHTML</h4><ul class="flickr_list"><li>画像サイズ ' 
-                       + '<input type="radio" class="radio-size" name="size" value="s">75px '
-                       + '<input type="radio" class="radio-size" name="size" value="t">100px '
-                       + '<input type="radio" class="radio-size" name="size" value="q">150px '
-                       + '<input type="radio" class="radio-size" name="size" value="m">240px '
-                       + '<input type="radio" class="radio-size" name="size" value="n">320px '
-                       + '<input type="radio" class="radio-size" name="size" value="" checked="checked">500px '
-                       + '<input type="radio" class="radio-size" name="size" value="z">640px '
-                       + '<input type="radio" class="radio-size" name="size" value="c">800px '
-                       + '<input type="radio" class="radio-size" name="size" value="b">1024px '
-                       + '</li><li>class: <input type="text" id="lightbox-image-class" value="alignleft" />'
-                       + '</ul><div id="lightbox-image-html"></div>'
-   + '<div id="lightbox-secNav"><a href="#" id="lightbox-secNav-btnClose"><img src="' + settings.imageBtnClose + '"></a></div></div></div></div>');	
-
-      $("input:radio[name='size']").change(function() {
-        _show_image_html();
-      });
-
+			$('body').append('<div id="jquery-overlay"></div><div id="jquery-lightbox"><div id="lightbox-container-image-box"><div id="lightbox-container-image"><img id="lightbox-image"><div style="" id="lightbox-nav"><a href="#" id="lightbox-nav-btnPrev"></a><a href="#" id="lightbox-nav-btnNext"></a></div><div id="lightbox-loading"><a href="#" id="lightbox-loading-link"><img src="' + settings.imageLoading + '"></a></div></div></div><div id="lightbox-container-image-data-box"><div id="lightbox-container-image-data">'
+   + '<div id="lightbox-flickr"></div>'
+   + '<div id="lightbox-image-details"><span id="lightbox-image-details-currentNumber"></span></div><div id="lightbox-secNav"><a href="#" id="lightbox-secNav-btnClose"><img src="' + settings.imageBtnClose + '"></a></div></div></div></div>');	
 
 			// Get page sizes
 			var arrPageSizes = ___getPageSize();
@@ -179,12 +162,8 @@
 			$('#lightbox-image-details-caption').hide();
             
 			if ( settings.imageArray[settings.activeImage][1] ) {
-        var id = settings.imageArray[settings.activeImage][1];
-        var title = $.flickr.images[id].title;
-        // Get Data from Flickr Objects
-
-				$('#lightbox-image-info').html('<ul class="flickr_list"><li id="flickr_title">' + title + '<br /><a target="htmltoflickr" href="http://www.flickr.com/photos/' + $.flickr.s.user_id  + '/' + $.flickr.images[id].id  + '"><img src="./images/flickr.png"> Flickr Link</a> : <a href="" id="twitter-' + id + '"><img src="./images/twitter.png"> Post to Twitter</a> : ' +  '<a target="amazon" href="http://www.amazon.co.jp/gp/search?ie=UTF8&keywords=' +  encodeURIComponent(title)  + '&tag=goodpic-22&index=blended&linkCode=ur2&camp=247&creative=1211"><img src="./images/amazon.gif"> Search Amazon</a><img src="http://www.assoc-amazon.jp/e/ir?t=goodpic-22&l=ur2&o=9" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></li>');
-        $('#twitter-' + id).attr("href", "javascript:var%20d=document,w=window,l=location,e=encodeURIComponent,f='http://twitter.com/home/?status=" + encodeURIComponent(title) + "%20" + "http://www.flickr.com/photos/" + $.flickr.s.user_id  + "/" + $.flickr.images[id].id + "';if(!w.open(f,'flickrtotwitter'))l.href=f;void(0);");
+        $.flickr.showImageTitle(settings.imageArray[settings.activeImage][1]);
+        $.flickr.getImageInfo(settings.imageArray[settings.activeImage][1]);
 			}
 			// If we have a image set, display 'Image X of X'
 			if ( settings.imageArray.length > 1 ) {
@@ -192,12 +171,6 @@
 			}		
 		}
 
-		function _show_image_html() {
-			if ( settings.imageArray[settings.activeImage][1] ) {
-        $.flickr.getImageInfo(settings.imageArray[settings.activeImage][1]);
-      }
-    }
-        
 		/**
 		 * Prepares image exibition; doing a image's preloader to calculate it's size
 		 *
@@ -221,16 +194,16 @@
 		/**
 		 * Perfomance an effect in the image container resizing it
 		 *
-		 * @param integer intImageWidth The imageｴs width that will be showed
-		 * @param integer intImageHeight The imageｴs height that will be showed
+		 * @param integer intImageWidth The image's width that will be showed
+		 * @param integer intImageHeight The image's height that will be showed
 		 */
 		function _resize_container_image_box(intImageWidth,intImageHeight) {
 			// Get current width and height
 			var intCurrentWidth = $('#lightbox-container-image-box').width();
 			var intCurrentHeight = $('#lightbox-container-image-box').height();
 			// Get the width and height of the selected image plus the padding
-			var intWidth = (intImageWidth + (settings.containerBorderSize * 2)); // Plus the imageｴs width and the left and right padding value
-			var intHeight = (intImageHeight + (settings.containerBorderSize * 2)); // Plus the imageｴs height and the left and right padding value
+			var intWidth = (intImageWidth + (settings.containerBorderSize * 2)); // Plus the image's width and the left and right padding value
+			var intHeight = (intImageHeight + (settings.containerBorderSize * 2)); // Plus the image's height and the left and right padding value
 			// Diferences
 			var intDiffW = intCurrentWidth - intWidth;
 			var intDiffH = intCurrentHeight - intHeight;
@@ -254,7 +227,6 @@
 			$('#lightbox-loading').hide();
 			$('#lightbox-image').fadeIn(function() {
 				_show_image_data();
-				_show_image_html();
 				_set_navigation();
 			});
 			_preload_neighbor_images();

@@ -19,39 +19,8 @@ $.flickr = {
 	target: {flickr: "#flickr", navi: "#tab-order ul#ordering",
 			     image: "#tab-order div#preview", icon: "#tab-order div#preview-icon",
 			     textarea: "#tab-html textarea#target"},
+  activeImage: null,
 
-  getImageUrl: function(id, size) {
-    if (size.match(/s|q|t|m|n|z|c|b/i)) {
-      size = '_' + size;
-    } else {
-      size = '';
-    }
-    return $.flickr.images[id].url + size;
-  },
-
-  getImage: function(id, size, href, title) {
-    if (href == "none") return ['<img src="', $.flickr.getImageUrl(id,size), '.jpg" />'].join('');
-    return ['<a href="', $.flickr.getImageUrl(id,href), '.jpg" rel="lightbox" title="',id,'"><img alt="',title,'" src="', $.flickr.getImageUrl(id,size),'.jpg" /></a>'].join('');
-  },
-
-  getImageInfo: function (id) {
-		var url = this.s.url + "&api_key=" + this.s.api_key + "&method=flickr.photos.getInfo&photo_id=" + $.flickr.images[id].id;
-
-		$.getJSON(url, function(r) {
-      console.debug(r);
-      id = 'flickr' + r.photo.id;
-      var size = $("input:radio[name='size']:checked").val();
-      var imageclass = $("#lightbox-image-class").attr("value");
-      var result = '<h4>画像のみ</h4><textarea class="flickr_textarea">'
-            + $.flickr.getImage(id,'size','b',r.photo.title._content)
-            + '</textarea>'
-            + '<h4>タイトルとテキストを表示</h4><textarea class="flickr_textarea">'
-            + ['<a href="', $.flickr.getImageUrl(id,'b'), '.jpg" rel="lightbox" title="', r.photo.title._content ,'"><img alt="',r.photo.title._content,'" src="', $.flickr.getImageUrl(id,size),'.jpg" class="flickr-image ', imageclass ,'" /></a><h4 class="flickr-title">',r.photo.title._content,'</h4><p class="flickr-time">',r.photo.dates.taken,'</p></h4>'].join('');
-      if (r.photo.description._content) result += '<p class="flickr-description">' + r.photo.description._content + '</p>';
-      result += '</textarea>';
-      $('#lightbox-image-html').html(result);
-		});    
-  },
 
 	init: function() {
 
@@ -99,7 +68,78 @@ $.flickr = {
 		});
 	},
 
-  
+  getImageUrl: function(id, size) {
+    if (size.match(/s|q|t|m|n|z|c|b/i)) {
+      size = '_' + size;
+    } else {
+      size = '';
+    }
+    return $.flickr.images[id].url + size + '.jpg';
+  },
+
+  getImage: function(id, size, href, title, classname) {
+    if (href == "none") return ['<img src="', $.flickr.getImageUrl(id,size), '" />'].join('');
+    return ['<a href="', $.flickr.getImageUrl(id,href),'" rel="lightbox" title="',id,'"><img alt="',title,'" src="', $.flickr.getImageUrl(id,size),'" class="',classname,'" /></a>'].join('');
+  },
+
+  getImageInfo: function (id) {
+    if (!$.flickr.images[id].date) {
+		  var url = this.s.url + "&api_key=" + this.s.api_key + "&method=flickr.photos.getInfo&photo_id=" + $.flickr.images[id].id;
+
+		  $.getJSON(url, function(r) {
+        // console.debug(r);
+        id = 'flickr' + r.photo.id;
+        $.flickr.images[id].date = r.photo.dates.taken;
+        $.flickr.images[id].farm = r.photo.dates.farm;
+        $.flickr.images[id].description = r.photo.description._content;
+        $.flickr.showImageInfo(id);
+		  });
+    } else {
+      $.flickr.showImageInfo(id);
+    }
+  },
+
+  showImageInfo: function(id) {
+
+    // if ($("input:radio[name='size']:checked")) $("#radio-size-default").attr('checked','checked');
+    var size = $("input:radio[name='size']:checked").val();
+    var classname = $("#lightbox-image-class").attr("value");
+    var result = '<h5>画像のみ</h5><textarea class="flickr_textarea">'
+          + $.flickr.getImage(id,size,'b',$.flickr.images[id].title,classname)
+          + '</textarea>'
+          + '<h5>タイトルとテキストを表示</h5><textarea class="flickr_textarea"><div class="flickr-section clearfix">'
+          + $.flickr.getImage(id,size,'b',$.flickr.images[id].title,classname)
+          + '<h4 class="flickr-title">' + $.flickr.images[id].title + '</h4><p class="flickr-time">' + $.flickr.images[id].date + '</p>';
+    if ($.flickr.images[id].description) result += '<p class="flickr-description">' + $.flickr.images[id].description + '</p>';
+    result += '</div></textarea>';
+    $('#lightbox-image-html').html(result);
+  },
+
+  showImageTitle: function(id) {
+    // Get Data from Flickr Objects
+    $.flickr.activeImage = id;
+    var title = $.flickr.images[id].title;
+
+		$('#lightbox-flickr').html('<ul class="flickr_list"><li id="flickr_title">' + title + ' <a target="htmltoflickr" href="http://www.flickr.com/photos/' + $.flickr.s.user_id  + '/' + $.flickr.images[id].id  + '"><img src="./images/flickr.png"></a> <a href="" id="twitter-' + id + '"><img src="./images/twitter.png"></a> ' +  '<a target="amazon" href="http://www.amazon.co.jp/gp/search?ie=UTF8&keywords=' +  encodeURIComponent(title)  + '&tag=goodpic-22&index=blended&linkCode=ur2&camp=247&creative=1211"><img src="./images/amazon.gif"></a><img src="http://www.assoc-amazon.jp/e/ir?t=goodpic-22&l=ur2&o=9" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></li>'
+      + '<div id="lightbox-image-info"></div>'
+      + '<ul class="flickr_list"><li>画像サイズ ' 
+      + '<input type="radio" class="radio-size" name="size" value="s">75px '
+      + '<input type="radio" class="radio-size" name="size" value="t">100px '
+      + '<input type="radio" class="radio-size" name="size" value="q">150px '
+      + '<input type="radio" class="radio-size" name="size" value="m">240px '
+      + '<input type="radio" class="radio-size" name="size" value="n" checked="checked">320px '
+      + '<input type="radio" class="radio-size" name="size" value="">500px '
+      + '<input type="radio" class="radio-size" name="size" value="z">640px '
+      + '<input type="radio" class="radio-size" name="size" value="c">800px '
+      + '<input type="radio" class="radio-size" name="size" value="b">1024px '
+      + '</li><li>class: <input type="text" id="lightbox-image-class" value="alignleft" />'
+      + '</ul><div id="lightbox-image-html"></div>');
+
+    $('#twitter-' + id).attr("href", "javascript:var%20d=document,w=window,l=location,e=encodeURIComponent,f='http://twitter.com/home/?status=" + encodeURIComponent(title) + "%20" + "http://www.flickr.com/photos/" + $.flickr.s.user_id  + "/" + $.flickr.images[id].id + "';if(!w.open(f,'flickrtotwitter'))l.href=f;void(0);");
+    $("input:radio[name='size']").change(function() {
+      $.flickr.getImageInfo($.flickr.activeImage);
+    });
+  },
 
   loadImages: function(r,s) {
 		var list = [];
@@ -115,9 +155,10 @@ $.flickr = {
 				$.flickr.images[id] = {
 					title: this.title,
           id: this.id,
+          farm: this.farm,
 					url: 'http://farm' + this.farm + '.static.flickr.com/' + this.server + '/' + this.id + '_' + this.secret
 				}; 
-				list.push('<div class="float" >', $.flickr.getImage(id, "s", "z", "") ,'<br /><input type="checkbox" class="imagechoice" value="' , id , '" />写真 <input type="checkbox" class="iconchoice" value="' , id , '" />小</div>');
+				list.push('<div class="float" >', $.flickr.getImage(id, "s", "z", "",'') ,'<br /><input type="checkbox" class="imagechoice" value="' , id , '" />写真 <input type="checkbox" class="iconchoice" value="' , id , '" />小</div>');
 			});
     }
 		$(this.target.flickr).html(list.join(''));
@@ -156,7 +197,7 @@ $.flickr = {
 
 		$.each( $.flickr.order, function (){
 			list.push("<li id=\"", this, "\">");
-			this.match(/^li_br/) ? list.push("<img src=\"./images/li_br.png\" width=\"75\" height=\"20\"\"/>") : list.push($.flickr.getImage(this,"s","none",""));
+			this.match(/^li_br/) ? list.push("<img src=\"./images/li_br.png\" width=\"75\" height=\"20\"\"/>") : list.push($.flickr.getImage(this,"s","none","",''));
 			list.push("</li>");
 		});
 		$(this.target.navi).html(list.join(''));
@@ -170,7 +211,7 @@ $.flickr = {
 		this.order = [];
 		
 		$(this.target.navi).children().each( function(){
-			this.id.match(/^li_br[0-9]./) ? list.push("<br />\n\n") : list.push($.flickr.getImage(this.id, size,"b", $.flickr.images[this.id].title));
+			this.id.match(/^li_br[0-9]./) ? list.push("<br />\n\n") : list.push($.flickr.getImage(this.id, size,"b", $.flickr.images[this.id].title,''));
 			$.flickr.order.push(this.id);
 		});
 		$(this.target.image).html(list.join(''));
@@ -183,7 +224,7 @@ $.flickr = {
 		if ($("input:checkbox:checked.iconchoice").length) {
 			list.push("\n\n<div class=\"photoicons\">");
 			$("input:checkbox:checked.iconchoice").each( function(){
-				list.push($.flickr.getImage(this.value,"s","b",""));
+				list.push($.flickr.getImage(this.value,"s","b","",''));
 			});
 			list.push("</div>");
 		}
