@@ -107,7 +107,7 @@ $.flickr = {
     var result = '<h5>画像のみ</h5><textarea class="flickr_textarea">'
           + $.flickr.getImage(id,size,'b',$.flickr.images[id].title,classname)
           + '</textarea>'
-          + '<h5>タイトルとテキストを表示</h5><textarea class="flickr_textarea"><div class="flickr-section clearfix">'
+          + '<h5>タイトルとテキストを表示</h5><textarea class="flickr_textarea"><div class="flickr-section clearfix" id="' + id + '">'
           + $.flickr.getImage(id,size,'b',$.flickr.images[id].title,classname)
           + '<h4 class="flickr-title">' + $.flickr.images[id].title + '</h4><p class="flickr-time">' + $.flickr.images[id].date + '</p>';
     if ($.flickr.images[id].description) result += '<p class="flickr-description">' + $.flickr.images[id].description + '</p>';
